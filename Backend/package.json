@@ -1,0 +1,22 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "this is backend to handle APIs for TaskList project",
+  "main": "index.mjs",
+  "scripts": {
+    "start": "node index.mjs",
+    "smoke-test": "node scripts/smoke-test.mjs",
+    "test": "echo \"No Tests\""
+  },
+  "author": "chirayu humar",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "date-fns": "^2.30.0",
+    "dotenv": "^17.2.1",
+    "express": "^4.18.2",
+    "sqlite": "^4.2.1",
+    "sqlite3": "^5.1.6",
+    "uuid": "^9.0.0"
+  }
+}

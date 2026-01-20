@@ -1,0 +1,28 @@
+GET http://localhost:8082/createTable 
+Content-Type: application/json
+
+###
+POST http://localhost:8082/insertData 
+Content-Type: application/json 
+
+{
+    "taskDetail":"to join gym",
+    "lastDate":"2023-10-03"
+}
+
+###
+GET http://localhost:8082/printTable
+Content-Type: application/json
+
+###
+PUT http://localhost:8082/change/task/9d050dad-23f1-4a5c-aec0-8f2a928abb2f
+Content-Type: application/json 
+
+{
+    "taskDetail":"eat food",
+    "lastDate":"2023-05-30"
+}
+
+###
+DELETE http://localhost:8082/delete/task/36ef5cba-54b8-4372-a691-311b71a20a21
+Content-Type: application/json

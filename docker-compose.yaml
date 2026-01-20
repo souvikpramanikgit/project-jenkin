@@ -1,0 +1,16 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./Backend
+    image: be
+    ports:
+      - "8082:8082"
+
+  frontend:
+    build: ./Frontend
+    image: fe
+    ports:
+      - "3000:3000"
+    env_file: "./Frontend/.env"
+

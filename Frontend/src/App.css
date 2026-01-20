@@ -1,0 +1,77 @@
+.App {
+  min-height: 100vh;
+  background-color: #7242f5;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+}
+.innerDiv{
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  max-height: 100%;
+  border-radius: 30px;
+  background-color: white;
+  width: 100%;
+  justify-content: flex-start;
+  align-items: stretch;
+  overflow: hidden;
+  background-image: url("https://cdn.pixabay.com/photo/2016/11/06/23/51/buildings-1804481_1280.jpg");
+  background-size: cover;
+}
+.innerDivChild1{
+  /* background-color: blue; */
+  width: 30%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 20px;
+  justify-content: flex-start;
+  align-items: center;
+}
+.innerDivChild2{
+  /* background-color: cyan; */
+  width: 70%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  overflow-y: auto;
+  padding: 10px;
+  flex-wrap: wrap;
+  /* flex-grow: 1; */
+  overflow: auto;
+  background-size: cover;
+}
+form{
+  display: flex;
+  flex-direction: column;
+  color: white;
+  position: fixed;
+}
+hr{
+  width: 100%;
+}
+.specialInput{
+  margin: 5px;
+  appearance: none;
+  border-radius: 10px;
+  outline: none;
+  padding: 5px;
+  border-width: 0px;
+}
+.createBtn{
+  background-color: black;
+  color: white;
+  border-radius: 20px;
+  padding: 5px;
+  margin-top: 30px;
+  border-width: 0px;
+}
+.createBtn:hover{
+  cursor: pointer;
+  outline: none;
+}
