@@ -2,6 +2,8 @@ pipeline {
 
     agent any
 
+    
+
     environment {
 
         DOCKER_COMPOSE = 'docker-compose'
@@ -32,42 +34,6 @@ pipeline {
 
         
 
-        stage('Build Backend Image') {
-
-            steps {
-
-                echo "Building backend Docker image for ${DOCKER_HUB_REPO}..."
-
-                sh '''
-
-                    docker build -t ${DOCKER_HUB_REPO}-backend:${BUILD_NUMBER} -t ${DOCKER_HUB_REPO}-backend:latest ./Backend
-
-                '''
-
-            }
-
-        }
-
-        
-
-        stage('Build Frontend Image') {
-
-            steps {
-
-                echo "Building frontend Docker image for ${DOCKER_HUB_REPO}..."
-
-                sh '''
-
-                    docker build -t ${DOCKER_HUB_REPO}-frontend:${BUILD_NUMBER} -t ${DOCKER_HUB_REPO}-frontend:latest ./Frontend
-
-                '''
-
-            }
-
-        }
-
-        
-
         stage('Build with Docker Compose') {
 
             steps {
@@ -77,6 +43,30 @@ pipeline {
                 sh '''
 
                     docker-compose build --no-cache
+
+                '''
+
+            }
+
+        }
+
+        
+
+        stage('Tag Images for Docker Hub') {
+
+            steps {
+
+                echo 'Tagging images for Docker Hub...'
+
+                sh '''
+
+                    docker tag be:latest ${DOCKER_HUB_REPO}-backend:${BUILD_NUMBER}
+
+                    docker tag be:latest ${DOCKER_HUB_REPO}-backend:latest
+
+                    docker tag fe:latest ${DOCKER_HUB_REPO}-frontend:${BUILD_NUMBER}
+
+                    docker tag fe:latest ${DOCKER_HUB_REPO}-frontend:latest
 
                 '''
 
@@ -104,33 +94,17 @@ pipeline {
 
         
 
-        stage('Push Backend Image to Docker Hub') {
+        stage('Push Images to Docker Hub') {
 
             steps {
 
-                echo 'Pushing backend image to Docker Hub...'
+                echo 'Pushing images to Docker Hub...'
 
                 sh '''
 
                     docker push ${DOCKER_HUB_REPO}-backend:${BUILD_NUMBER}
 
                     docker push ${DOCKER_HUB_REPO}-backend:latest
-
-                '''
-
-            }
-
-        }
-
-        
-
-        stage('Push Frontend Image to Docker Hub') {
-
-            steps {
-
-                echo 'Pushing frontend image to Docker Hub...'
-
-                sh '''
 
                     docker push ${DOCKER_HUB_REPO}-frontend:${BUILD_NUMBER}
 
