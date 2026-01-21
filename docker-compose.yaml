@@ -2,15 +2,14 @@ version: "3.9"
 
 services:
   backend:
-    build: ./Backend
-    image: be
-    ports:
-      - "8082:8082"
+    image: ${DOCKER_HUB_REPO}-backend:${IMAGE_TAG}
+    build:
+      context: ./backend
+    restart: always
 
   frontend:
-    build: ./Frontend
-    image: fe
-    ports:
-      - "3000:3000"
-    env_file: "./Frontend/.env"
+    image: ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG}
+    build:
+      context: ./frontend
+    restart: always
 
