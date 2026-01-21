@@ -2,7 +2,7 @@
 
 services:
   backend:
-    image: ${DOCKER_HUB_REPO}-backend:${IMAGE_TAG}
+    image: ${DOCKER_HUB_REPO}-backend:${IMAGE_TAG:-latest}
     build:
       context: ./Backend
     restart: always
@@ -10,7 +10,7 @@ services:
       - "8082:8082"
 
   frontend:
-    image: ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG}
+    image: ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG:-latest}
     build:
       context: ./Frontend
     restart: always
