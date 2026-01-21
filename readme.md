@@ -39,10 +39,9 @@ npm index.mjs
 backend server would be started
 create a new terminal (do not cancel previous terminal)
 (moving to Frontend directory)
+
 ```
 cd Frontend 
 npm install 
 npm start 
 ```
-
-know you can observe frontend in your terminal, please remember to ctrl + C to both the terminals after testing 
