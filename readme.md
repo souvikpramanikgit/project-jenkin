@@ -6,7 +6,7 @@ few importent points to be aware about
 * use node version v22.14.0 for both frontend and backend
 * please start backend server first before starting frontend
 
-### Clone the repository 
+### Clone the repository  
 
 ### write click on it, then choose "open in terminal"
 
