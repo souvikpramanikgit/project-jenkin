@@ -6,6 +6,7 @@ pipeline {
         PROJECT_NAME = 'tasklist-app'
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
         DOCKER_HUB_REPO = "${DOCKERHUB_CREDENTIALS_USR}/${PROJECT_NAME}"
+        IMAGE_TAG = "${BUILD_NUMBER}"
     }
     
     stages {
@@ -25,14 +26,12 @@ pipeline {
             }
         }
         
-        stage('Tag Images for Docker Hub') {
+        stage('Tag Images as latest') {
             steps {
-                echo 'Tagging images for Docker Hub...'
+                echo 'Tagging build images as latest...'
                 sh '''
-                    docker tag be:latest ${DOCKER_HUB_REPO}-backend:${BUILD_NUMBER}
-                    docker tag be:latest ${DOCKER_HUB_REPO}-backend:latest
-                    docker tag fe:latest ${DOCKER_HUB_REPO}-frontend:${BUILD_NUMBER}
-                    docker tag fe:latest ${DOCKER_HUB_REPO}-frontend:latest
+                    docker tag ${DOCKER_HUB_REPO}-backend:${IMAGE_TAG} ${DOCKER_HUB_REPO}-backend:latest
+                    docker tag ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG} ${DOCKER_HUB_REPO}-frontend:latest
                 '''
             }
         }
@@ -50,9 +49,9 @@ pipeline {
             steps {
                 echo 'Pushing images to Docker Hub...'
                 sh '''
-                    docker push ${DOCKER_HUB_REPO}-backend:${BUILD_NUMBER}
+                    docker push ${DOCKER_HUB_REPO}-backend:${IMAGE_TAG}
                     docker push ${DOCKER_HUB_REPO}-backend:latest
-                    docker push ${DOCKER_HUB_REPO}-frontend:${BUILD_NUMBER}
+                    docker push ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG}
                     docker push ${DOCKER_HUB_REPO}-frontend:latest
                 '''
             }
