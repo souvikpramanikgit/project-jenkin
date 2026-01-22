@@ -11,5 +11,7 @@ COPY . .
 # Expose port
 EXPOSE 3000
 
+ENV REACT_APP_BACKEND_URL=http://localhost:8082
+
 # Start in development mode (not optimized for production)
 CMD npm start
