@@ -21,7 +21,7 @@ pipeline {
             steps {
                 echo 'Building images with docker-compose...'
                 sh '''
-                    docker compose build --no-cache
+                    docker compose build
                 '''
             }
         }
