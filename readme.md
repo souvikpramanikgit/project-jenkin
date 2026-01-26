@@ -8,11 +8,6 @@ few importent points to be aware about
 
 ### Clone the repository  
 
-### write click on it, then choose "open in terminal"
-
-### write below command 
-"code ."
-
 ### Create .env file in both Backend and Frontend S
 give follwoing commands 
 ```
