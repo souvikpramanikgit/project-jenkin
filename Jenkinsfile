@@ -1,46 +1,95 @@
 pipeline {
     agent any
-    
+
+    tools {
+        sonarScanner 'sonar'
+    }
+
     environment {
-        DOCKER_COMPOSE = 'docker compose'
         PROJECT_NAME = 'tasklist-app'
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
         DOCKER_HUB_REPO = "${DOCKERHUB_CREDENTIALS_USR}/${PROJECT_NAME}"
         IMAGE_TAG = "${BUILD_NUMBER}"
     }
-    
+
     stages {
-        stage('Checkout') {
+
+        stage('Checkout Code') {
             steps {
-                echo 'Checking out code from repository...'
+                echo 'Checking out source code...'
                 checkout scm
             }
         }
-        
-        stage('Build with Docker Compose') {
+
+        stage('SonarQube Static Code Analysis') {
             steps {
-                echo 'Building images with docker-compose...'
+                withSonarQubeEnv('sonar') {
+                    sh '''
+                        sonar-scanner \
+                        -Dsonar.projectName=TaskManagementApp \
+                        -Dsonar.projectKey=TaskManagementApp
+                    '''
+                }
+            }
+        }
+
+        stage('OWASP Dependency Check') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'owasp'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+
+        stage('SonarQube Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Trivy File System Scan') {
+            steps {
+                sh '''
+                    trivy fs --severity HIGH,CRITICAL \
+                    --format table \
+                    -o trivy-fs-report.html .
+                '''
+            }
+        }
+
+        stage('Docker Build (Docker Compose)') {
+            steps {
+                echo 'Building Docker images...'
                 sh '''
                     docker compose build
                 '''
             }
         }
-        
-        stage('Tag Images as latest') {
+
+        stage('Tag Docker Images') {
             steps {
-                echo 'Tagging build images as latest...'
                 sh '''
                     docker tag ${DOCKER_HUB_REPO}-backend:${IMAGE_TAG} ${DOCKER_HUB_REPO}-backend:latest
                     docker tag ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG} ${DOCKER_HUB_REPO}-frontend:latest
                 '''
             }
         }
-        
+
+        stage('Trivy Image Scan') {
+            steps {
+                sh '''
+                    trivy image ${DOCKER_HUB_REPO}-backend:${IMAGE_TAG}
+                    trivy image ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG}
+                '''
+            }
+        }
+
         stage('Login to Docker Hub') {
             steps {
-                echo "Logging in to Docker Hub as ${DOCKERHUB_CREDENTIALS_USR}..."
                 sh '''
-                    echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
+                    echo $DOCKERHUB_CREDENTIALS_PSW | docker login \
+                    -u $DOCKERHUB_CREDENTIALS_USR --password-stdin
                 '''
             }
         }
@@ -48,29 +97,26 @@ pipeline {
         // docker push ${DOCKER_HUB_REPO}-frontend:latest
         stage('Push Images to Docker Hub') {
             steps {
-                echo 'Pushing images to Docker Hub...'
                 sh '''
                     docker push ${DOCKER_HUB_REPO}-backend:${IMAGE_TAG}
-                    
+
                     docker push ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG}
                     
                 '''
             }
         }
     }
-    
+
     post {
         success {
-            echo 'Pipeline succeeded! Images built and containers started.'
+            echo '✅ Pipeline completed successfully!'
         }
         failure {
-            echo 'Pipeline failed! Check logs for details.'
+            echo '❌ Pipeline failed. Check logs.'
         }
         always {
             sh 'docker logout || true'
-            echo 'Cleaning up...'
-            // Optional: Remove old images to save space
-            // sh '''docker rmi -f $(docker images "souvik5/tasklist*" -q)'''
+            echo 'Cleanup done.'
         }
     }
 }
