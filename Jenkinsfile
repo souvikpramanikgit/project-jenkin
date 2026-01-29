@@ -70,7 +70,7 @@ pipeline {
             sh 'docker logout || true'
             echo 'Cleaning up...'
             // Optional: Remove old images to save space
-            sh 'docker rmi -f $(docker images "souvik5/tasklist*" -q)'
+            sh '''docker rmi -f $(docker images "souvik5/tasklist*" -q)'''
         }
     }
 }
