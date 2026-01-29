@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        sonarScanner 'sonar'
-    }
-
     environment {
         PROJECT_NAME = 'tasklist-app'
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
@@ -27,11 +23,20 @@ pipeline {
                     sh '''
                         sonar-scanner \
                         -Dsonar.projectName=TaskManagementApp \
-                        -Dsonar.projectKey=TaskManagementApp
+                        -Dsonar.projectKey=TaskManagementApp \
+                        -Dsonar.sources=.
                     '''
                 }
             }
         }
+
+        // stage('SonarQube Quality Gate') {
+        //    steps {
+        //        timeout(time: 2, unit: 'MINUTES') {
+        //            waitForQualityGate abortPipeline: true
+        //        }
+        //    }
+        // }
 
         stage('OWASP Dependency Check') {
             steps {
