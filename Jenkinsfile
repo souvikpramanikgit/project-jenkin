@@ -26,12 +26,12 @@ pipeline {
         //     }
         // }
 
-        stage("OWASP Dependency Check"){
-            steps{
-                dependencyCheck additionalArguments: '--scan ./ --nvd_owasp ${nvd-owsap}', odcInstallation: 'owasp'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
+        // stage("OWASP Dependency Check"){
+        //     steps{
+        //         dependencyCheck additionalArguments: '--scan ./ --nvd_owasp ${nvd-owsap}', odcInstallation: 'owasp'
+        //         dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+        //     }
+        // }
 
         stage("OWASP Dependency Check"){
             steps{
