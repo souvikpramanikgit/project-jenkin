@@ -1,6 +1,8 @@
 pipeline {
     agent any
-
+    environment{
+        SONAR_HOME= tool "sonar"
+    }
     environment {
         PROJECT_NAME = 'tasklist-app'
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
@@ -17,15 +19,10 @@ pipeline {
             }
         }
 
-        stage('SonarQube Static Code Analysis') {
-            steps {
-                withSonarQubeEnv('sonar') {
-                    sh '''
-                        sonar-scanner \
-                        -Dsonar.projectName=TaskManagementApp \
-                        -Dsonar.projectKey=TaskManagementApp \
-                        -Dsonar.sources=.
-                    '''
+        stage("SonarQube Quality Analysis"){
+            steps{
+                withSonarQubeEnv("sonar"){
+                    sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=TaskManagementApp -Dsonar.projectKey=TaskManagementApp"
                 }
             }
         }
