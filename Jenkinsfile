@@ -25,17 +25,9 @@ pipeline {
                 }
             }
         }
-        
-        // stage('SonarQube Quality Gate') {
-        //    steps {
-        //        timeout(time: 2, unit: 'MINUTES') {
-        //            waitForQualityGate abortPipeline: true
-        //        }
-        //    }
-        // }
 
-        stage('OWASP Dependency Check') {
-            steps {
+        stage("OWASP Dependency Check"){
+            steps{
                 dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'owasp'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
