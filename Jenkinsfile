@@ -22,7 +22,7 @@ pipeline {
                     script {
                         def scannerHome = tool 'sonar-scanner'
                         sh """
-                        ${scannerHome}/bin/sonar-scanner \
+                        /opt/sonar-scanner/bin/sonar-scanner \
                         -Dsonar.projectName=TaskManagementApp \
                         -Dsonar.projectKey=TaskManagementApp \
                         -Dsonar.sources=.
