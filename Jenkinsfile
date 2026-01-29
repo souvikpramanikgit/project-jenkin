@@ -1,11 +1,8 @@
 pipeline {
     agent any
-
-    environment{
-        SONAR_HOME= tool "sonar"
-    }
     
     environment {
+        SONAR_HOME = tool "sonar"
         PROJECT_NAME = 'tasklist-app'
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
         DOCKER_HUB_REPO = "${DOCKERHUB_CREDENTIALS_USR}/${PROJECT_NAME}"
