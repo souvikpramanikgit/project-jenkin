@@ -44,15 +44,16 @@ pipeline {
                 '''
             }
         }
-        
+        // docker push ${DOCKER_HUB_REPO}-backend:latest
+        // docker push ${DOCKER_HUB_REPO}-frontend:latest
         stage('Push Images to Docker Hub') {
             steps {
                 echo 'Pushing images to Docker Hub...'
                 sh '''
                     docker push ${DOCKER_HUB_REPO}-backend:${IMAGE_TAG}
-                    // docker push ${DOCKER_HUB_REPO}-backend:latest
+                    
                     docker push ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG}
-                    // docker push ${DOCKER_HUB_REPO}-frontend:latest
+                    
                 '''
             }
         }
