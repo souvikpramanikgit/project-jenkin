@@ -28,8 +28,19 @@ pipeline {
 
         stage("OWASP Dependency Check"){
             steps{
-                dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'owasp'
+                dependencyCheck additionalArguments: '--scan ./ --nvd_owasp ${nvd-owsap}', odcInstallation: 'owasp'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+
+        stage("OWASP Dependency Check"){
+            steps{
+                script {
+                    withCredentials([string(credentialsId: 'nvd_owasp', variable: 'NVD_API_KEY')]) {
+                        dependencyCheck additionalArguments: "--scan ./ --nvdApiKey ${NVD_API_KEY}", odcInstallation: 'owasp'
+                        dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                    }
+                }
             }
         }
 
