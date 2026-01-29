@@ -28,17 +28,44 @@ pipeline {
 
         // stage("OWASP Dependency Check"){
         //     steps{
-        //         dependencyCheck additionalArguments: '--scan ./ --nvd_owasp ${nvd-owsap}', odcInstallation: 'owasp'
-        //         dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+        //         script {
+        //             withCredentials([string(credentialsId: 'nvd_owasp', variable: 'NVD_API_KEY')]) {
+        //                 dependencyCheck additionalArguments: "--scan ./ --nvdApiKey ${NVD_API_KEY}", odcInstallation: 'owasp'
+        //                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+        //             }
+        //         }
         //     }
         // }
+
+        stage('Test OWASP Installation') {
+            steps {
+                sh '''
+                    which dependency-check || echo "dependency-check not in PATH"
+                    ls -la /var/jenkins_home/tools/ || echo "Cannot list tools directory"
+                '''
+            }
+        }
 
         stage("OWASP Dependency Check"){
             steps{
                 script {
-                    withCredentials([string(credentialsId: 'nvd_owasp', variable: 'NVD_API_KEY')]) {
-                        dependencyCheck additionalArguments: "--scan ./ --nvdApiKey ${NVD_API_KEY}", odcInstallation: 'owasp'
+                    try {
+                        echo '🔍 Starting OWASP Dependency Check...'
+                        withCredentials([string(credentialsId: 'nvd_owasp', variable: 'NVD_API_KEY')]) {
+                            echo 'API Key loaded successfully'
+                            dependencyCheck(
+                                additionalArguments: "--scan ./ --nvdApiKey ${NVD_API_KEY} --format HTML --format XML --enableExperimental",
+                                odcInstallation: 'owasp'
+                            )
+                        }
+                        echo '📊 Publishing dependency check report...'
                         dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                        echo '✅ OWASP Dependency Check completed'
+                    } catch (Exception e) {
+                        echo "❌ OWASP Failed with error: ${e.toString()}"
+                        echo "Error message: ${e.getMessage()}"
+                        echo "Stack trace: ${e.getStackTrace()}"
+                        throw e
                     }
                 }
             }
