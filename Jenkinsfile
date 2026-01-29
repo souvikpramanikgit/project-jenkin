@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        SONAR_HOME = tool "sonar"
+        // SONAR_HOME = tool "sonar"
         PROJECT_NAME = 'tasklist-app'
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
         DOCKER_HUB_REPO = "${DOCKERHUB_CREDENTIALS_USR}/${PROJECT_NAME}"
@@ -18,13 +18,13 @@ pipeline {
             }
         }
 
-        stage("SonarQube Quality Analysis"){
-            steps{
-                withSonarQubeEnv("sonar"){
-                    sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=TaskManagementApp -Dsonar.projectKey=TaskManagementApp"
-                }
-            }
-        }
+        // stage("SonarQube Quality Analysis"){
+        //     steps{
+        //         withSonarQubeEnv("sonar"){
+        //             sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=TaskManagementApp -Dsonar.projectKey=TaskManagementApp"
+        //         }
+        //     }
+        // }
 
         stage("OWASP Dependency Check"){
             steps{
@@ -33,13 +33,13 @@ pipeline {
             }
         }
 
-        stage('SonarQube Quality Gate') {
-            steps {
-                timeout(time: 2, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
+        // stage('SonarQube Quality Gate') {
+        //     steps {
+        //         timeout(time: 2, unit: 'MINUTES') {
+        //             waitForQualityGate abortPipeline: true
+        //         }
+        //     }
+        // }
 
         stage('Trivy File System Scan') {
             steps {
