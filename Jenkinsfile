@@ -50,9 +50,9 @@ pipeline {
                 echo 'Pushing images to Docker Hub...'
                 sh '''
                     docker push ${DOCKER_HUB_REPO}-backend:${IMAGE_TAG}
-                    docker push ${DOCKER_HUB_REPO}-backend:latest
+                    // docker push ${DOCKER_HUB_REPO}-backend:latest
                     docker push ${DOCKER_HUB_REPO}-frontend:${IMAGE_TAG}
-                    docker push ${DOCKER_HUB_REPO}-frontend:latest
+                    // docker push ${DOCKER_HUB_REPO}-frontend:latest
                 '''
             }
         }
@@ -69,7 +69,7 @@ pipeline {
             sh 'docker logout || true'
             echo 'Cleaning up...'
             // Optional: Remove old images to save space
-            // sh 'docker image prune -f'
+            sh 'docker image prune -f'
         }
     }
 }
