@@ -2,7 +2,7 @@ pipeline {
     agent any
     
     environment {
-        // SONAR_HOME = tool "sonar"
+        SONAR_HOME = tool "sonar"
         PROJECT_NAME = 'tasklist-app'
         DOCKERHUB_CREDENTIALS = credentials('docker-hub-credentials')
         DOCKER_HUB_REPO = "${DOCKERHUB_CREDENTIALS_USR}/${PROJECT_NAME}"
@@ -18,66 +18,65 @@ pipeline {
             }
         }
 
-        // stage("SonarQube Quality Analysis"){
-        //     steps{
-        //         withSonarQubeEnv("sonar"){
-        //             sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=TaskManagementApp -Dsonar.projectKey=TaskManagementApp"
-        //         }
-        //     }
-        // }
-
-        // stage("OWASP Dependency Check"){
-        //     steps{
-        //         script {
-        //             withCredentials([string(credentialsId: 'nvd_owasp', variable: 'NVD_API_KEY')]) {
-        //                 dependencyCheck additionalArguments: "--scan ./ --nvdApiKey ${NVD_API_KEY}", odcInstallation: 'owasp'
-        //                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-        //             }
-        //         }
-        //     }
-        // }
-
-        stage('Test OWASP Installation') {
-            steps {
-                sh '''
-                    which dependency-check || echo "dependency-check not in PATH"
-                    ls -la /var/jenkins_home/tools/ || echo "Cannot list tools directory"
-                '''
+        stage("SonarQube Quality Analysis"){
+            steps{
+                withSonarQubeEnv("sonar"){
+                    sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=TaskManagementApp -Dsonar.projectKey=TaskManagementApp -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/target/**,**/*.log"
+                }
             }
         }
 
         stage("OWASP Dependency Check"){
+            when {
+                anyOf {
+                    fileExists 'pom.xml'
+                    fileExists 'package.json'
+                    fileExists 'requirements.txt'
+                    fileExists 'build.gradle'
+                }
+            }
             steps{
                 script {
-                    try {
-                        echo '🔍 Starting OWASP Dependency Check...'
-                        withCredentials([string(credentialsId: 'nvd_owasp', variable: 'NVD_API_KEY')]) {
-                            echo 'API Key loaded successfully'
-                            dependencyCheck(
-                                additionalArguments: "--scan ./ --nvdApiKey ${NVD_API_KEY} --format HTML --format XML --enableExperimental",
-                                odcInstallation: 'owasp'
-                            )
-                        }
-                        echo '📊 Publishing dependency check report...'
+                    withCredentials([string(credentialsId: 'nvd_owasp', variable: 'NVD_API_KEY')]) {
+                        dependencyCheck additionalArguments: "--scan ./ --nvdApiKey ${NVD_API_KEY}", odcInstallation: 'owasp'
                         dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-                        echo '✅ OWASP Dependency Check completed'
-                    } catch (Exception e) {
-                        echo "❌ OWASP Failed with error: ${e.toString()}"
-                        echo "Error message: ${e.getMessage()}"
-                        echo "Stack trace: ${e.getStackTrace()}"
-                        throw e
                     }
                 }
             }
         }
 
-        // stage('SonarQube Quality Gate') {
-        //     steps {
-        //         timeout(time: 2, unit: 'MINUTES') {
-        //             waitForQualityGate abortPipeline: true
+        // stage("OWASP Dependency Check"){
+        //     steps{
+        //         script {
+        //             try {
+        //                 echo '🔍 Starting OWASP Dependency Check...'
+        //                 withCredentials([string(credentialsId: 'nvd_owasp', variable: 'NVD_API_KEY')]) {
+        //                     echo 'API Key loaded successfully'
+        //                     dependencyCheck(
+        //                         additionalArguments: "--scan ./ --nvdApiKey ${NVD_API_KEY} --format HTML --format XML --enableExperimental",
+        //                         odcInstallation: 'owasp'
+        //                     )
+        //                 }
+        //                 echo '📊 Publishing dependency check report...'
+        //                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+        //                 echo '✅ OWASP Dependency Check completed'
+        //             } catch (Exception e) {
+        //                 echo "❌ OWASP Failed with error: ${e.toString()}"
+        //                 echo "Error message: ${e.getMessage()}"
+        //                 echo "Stack trace: ${e.getStackTrace()}"
+        //                 throw e
+        //             }
         //         }
         //     }
         // }
+
+        stage('SonarQube Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
 
         stage('Trivy File System Scan') {
             steps {
