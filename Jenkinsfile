@@ -28,11 +28,11 @@ pipeline {
 
         stage("OWASP Dependency Check"){
             when {
-                anyOf {
-                    fileExists 'pom.xml'
-                    fileExists 'package.json'
-                    fileExists 'requirements.txt'
-                    fileExists 'build.gradle'
+                expression {
+                    return fileExists('pom.xml') ||
+                           fileExists('package.json') ||
+                           fileExists('requirements.txt') ||
+                           fileExists('build.gradle')
                 }
             }
             steps{
