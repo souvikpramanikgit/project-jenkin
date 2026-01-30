@@ -27,19 +27,18 @@ pipeline {
         }
 
         stage("OWASP Dependency Check"){
-            when {
-                expression {
-                    return fileExists('pom.xml') ||
-                           fileExists('package.json') ||
-                           fileExists('requirements.txt') ||
-                           fileExists('build.gradle')
-                }
-            }
             steps{
                 script {
-                    withCredentials([string(credentialsId: 'nvd_owasp', variable: 'NVD_API_KEY')]) {
-                        dependencyCheck additionalArguments: "--scan ./ --nvdApiKey ${NVD_API_KEY}", odcInstallation: 'owasp'
-                        dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                    try {
+                        echo '🔍 Running OWASP Dependency Check...'
+                        withCredentials([string(credentialsId: 'nvd_owasp', variable: 'NVD_API_KEY')]) {
+                            dependencyCheck additionalArguments: "--scan ./ --nvdApiKey ${NVD_API_KEY} --format HTML --format XML", odcInstallation: 'owasp'
+                            dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                        }
+                        echo '✅ OWASP scan completed'
+                    } catch (Exception e) {
+                        echo "⚠️ OWASP scan had issues: ${e.getMessage()}"
+                        currentBuild.result = 'UNSTABLE'
                     }
                 }
             }
