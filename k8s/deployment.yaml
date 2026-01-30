@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: task-management-app
+  namespace: task-management
+  labels:
+    app: task-management
+spec:
+  replicas: 2
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: task-management
+  template:
+    metadata:
+      labels:
+        app: task-management
+    spec:
+      containers:
+
+      # -----------------------------
+      # Backend Container
+      # -----------------------------
+      - name: backend
+        image: someone15me/dp:backend-latest   # Jenkins will replace with versioned tag
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8082
+          name: backend-port
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: SERVER_PORT
+          value: "8082"
+        - name: FRONTEND_URL
+          value: "*"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        volumeMounts:
+        - name: backend-data
+          mountPath: /app/data
+
+      # -----------------------------
+      # Frontend Container
+      # -----------------------------
+      - name: frontend
+        image: someone15me/dp:frontend-latest   # Jenkins will replace with versioned tag
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          name: frontend-port
+        env:
+        - name: REACT_APP_BACKEND_URL
+          value: "http://localhost:8082"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+
+      # -----------------------------
+      # Volumes
+      # -----------------------------
+      volumes:
+      - name: backend-data
+        emptyDir: {}
