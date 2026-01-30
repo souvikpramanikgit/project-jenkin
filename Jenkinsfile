@@ -21,7 +21,7 @@ pipeline {
         stage("SonarQube Quality Analysis"){
             steps{
                 withSonarQubeEnv("sonar"){
-                    sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=TaskManagementApp -Dsonar.projectKey=TaskManagementApp -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/target/**,**/*.log"
+                    sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=TaskManagementApp -Dsonar.projectKey=TaskManagementApp -Dsonar.exclusions=**/node_modules/**,**/dist/**,**/build/**,**/target/**,**/*.log,**/dependency-check-report.*,**/trivy-*.html"
                 }
             }
         }
